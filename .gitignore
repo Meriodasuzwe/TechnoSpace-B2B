@@ -1,0 +1,5 @@
+shop.db
+static/uploads/*
+__pycache__/
+.env
+.venv/

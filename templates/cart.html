@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-card p-4">
+        <h2 class="mb-4 text-center"> Wholesale Order Checkout</h2>
+        
+        {% if not cart_items %}
+            <div class="alert alert-info text-center">
+                Your order list is empty. <a href="/dashboard" class="fw-bold">Go to Catalog</a>
+            </div>
+        {% else %}
+        
+            <form action="/checkout" method="POST">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle" style="background: transparent;">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Unit Price</th>
+                                <th>Quantity (Wholesale)</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ item.img }}" width="50" height="50" style="object-fit: contain;" class="me-3 rounded bg-white">
+                                        <div>
+                                            <h6 class="mb-0">{{ item.name }}</h6>
+                                            <small class="text-muted">Item ID: {{ item.id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.price }} ₸</td>
+                                <td style="width: 150px;">
+                                    <input type="number" name="qty_{{ item.id }}" class="form-control qty-input" 
+                                           value="10" min="10" data-price="{{ item.price }}" onchange="updateTotal()">
+                                    <div class="form-text text-warning" style="font-size: 0.7rem;">Min. 10 units</div>
+                                </td>
+                                <td class="fw-bold text-info item-total">{{ item.price * 10 }} ₸</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr class="border-secondary my-4">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label text-white-50">Warehouse Delivery Address:</label>
+                        <input type="text" name="address" class="form-control" placeholder="e.g. 10 Abay Ave, Warehouse #5, Almaty" required 
+                               style="background: rgba(255,255,255,0.1); border: 1px solid #555; color: white;">
+                    </div>
+                    <div class="col-md-6 text-end d-flex flex-column justify-content-center">
+                        <h4 class="text-white">Grand Total: <span id="grand-total" class="text-warning">0 ₸</span></h4>
+                        <small class="text-muted mb-3">Payment is made via invoice after confirmation.</small>
+                        
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="/clear_cart" class="btn btn-outline-danger">Clear Cart</a>
+                            <button type="submit" class="btn btn-success px-5 fw-bold">PLACE ORDER</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function updateTotal() {
+        let grandTotal = 0;
+        const inputs = document.querySelectorAll('.qty-input');
+        
+        inputs.forEach(input => {
+            const price = parseInt(input.dataset.price);
+            let qty = parseInt(input.value);
+            
+            if (qty < 10) { 
+                // Visual warning, but validation is handled on the server
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+            
+            const rowTotal = price * qty;
+            // Update the subtotal in the row
+            const rowTotalEl = input.closest('tr').querySelector('.item-total');
+            rowTotalEl.innerText = rowTotal + ' ₸';
+            
+            grandTotal += rowTotal;
+        });
+        
+        document.getElementById('grand-total').innerText = grandTotal + ' ₸';
+    }
+
+    // Initialize the calculation on page load
+    updateTotal();
+</script>
+{% endblock %}

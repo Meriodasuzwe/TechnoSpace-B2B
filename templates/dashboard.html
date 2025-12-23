@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="text-center mb-4">
+    <h1 class="display-5 fw-bold">TechnoSpace Catalog</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="glass-card p-3 sticky-top" style="top: 80px; z-index: 1;">
+            <h5 class="mb-3"><i class="bi bi-funnel"></i> Categories</h5>
+            <div class="d-grid gap-2">
+                <a href="/dashboard?category=all&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'all' %}active{% endif %}"> All Products</a>
+                <a href="/dashboard?category=phones&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'phones' %}active{% endif %}"> Smartphones</a>
+                <a href="/dashboard?category=laptops&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'laptops' %}active{% endif %}"> Laptops</a>
+                
+                <a href="/dashboard?category=gpu&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'gpu' %}active{% endif %}"> Graphics Cards</a>
+                <a href="/dashboard?category=cpu&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'cpu' %}active{% endif %}"> Processors</a>
+                
+                <a href="/dashboard?category=audio&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'audio' %}active{% endif %}"> Audio</a>
+                <a href="/dashboard?category=gadgets&sort={{ current_sort }}" class="btn btn-glass text-start {% if current_cat == 'gadgets' %}active{% endif %}"> Gadgets</a>
+            </div>
+            
+            <hr>
+            <h5 class="mb-3">Sorting</h5>
+             <div class="d-grid gap-2">
+                <a href="/dashboard?category={{ current_cat }}&sort=price_asc" class="btn btn-sm btn-glass">📉 Price: Low to High</a>
+                <a href="/dashboard?category={{ current_cat }}&sort=price_desc" class="btn btn-sm btn-glass">📈 Price: High to Low</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for p in products %}
+            <div class="col">
+                <div class="glass-card h-100 product-card position-relative d-flex flex-column">
+                    <img src="{{ p.img }}" class="card-img-top p-2" style="height: 200px; object-fit: contain; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal{{ p.id }}">
+                    
+                    <div class="card-body d-flex flex-column flex-grow-1">
+                        <h5 class="card-title">{{ p.name }}</h5>
+                        <p class="small text-white-50 mb-3">{{ p.desc }}</p>
+                        
+                        <div class="mt-auto">
+                            <h4 class="text-info mb-3">{{ p.price }} ₸</h4>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-glass btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal{{ p.id }}">ℹ Info</button>
+                                <a href="/add_to_cart/{{ p.id }}" class="btn btn-primary btn-sm flex-grow-1">Buy Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modal{{ p.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content text-dark" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title fw-bold text-dark">{{ p.name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{ p.img }}" class="img-fluid rounded mb-3 w-100" style="max-height: 300px; object-fit: contain;">
+                            <p class="text-dark">{{ p.desc }}</p>
+                            <h4 class="text-primary">{{ p.price }} ₸</h4>
+                            <hr>
+                            <h6 class="fw-bold">Specifications:</h6>
+                            <ul class="list-group list-group-flush bg-transparent">
+                                {% if p.specs %}
+                                    {% for key, value in p.specs.items() %}
+                                    <li class="list-group-item d-flex justify-content-between bg-transparent">
+                                        <span class="text-muted">{{ key }}</span>
+                                        <span class="fw-bold text-dark">{{ value }}</span>
+                                    </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <a href="/add_to_cart/{{ p.id }}" class="btn btn-primary">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
